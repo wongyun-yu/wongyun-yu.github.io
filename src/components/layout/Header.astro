@@ -73,7 +73,7 @@ const socialLinks: {
 			}
 		</nav>
 		<!-- Social Links below navigation -->
-		<div class="hidden sm:flex sm:justify-start sm:ml-9 sm:mt-2 sm:transform sm:translate-y-0.1">
+		<div class="flex justify-start ml-2 mt-2 sm:ml-9 sm:mt-2 sm:transform sm:translate-y-0.1">
 			<ul class="flex items-center gap-x-2">
 				{
 					socialLinks.map(({ friendlyName, isWebmention, link, name }) => (
@@ -84,7 +84,7 @@ const socialLinks: {
 								rel={`noreferrer ${isWebmention ? "me authn" : ""}`}
 								target="_blank"
 							>
-								<Icon aria-hidden="true" class="h-6 w-6" focusable="false" name={name} />
+								<Icon aria-hidden="true" class="h-5 w-5 sm:h-6 sm:w-6" focusable="false" name={name} />
 								<span class="sr-only">{friendlyName}</span>
 							</a>
 						</li>
