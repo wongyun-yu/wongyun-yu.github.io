@@ -1,61 +1,265 @@
 ---
-import { type CollectionEntry, getCollection } from "astro:content";
-import SocialList from "@/components/SocialList.astro";
-import PostPreview from "@/components/blog/PostPreview.astro";
-import Note from "@/components/note/Note.astro";
-import { getAllPosts } from "@/data/post";
 import PageLayout from "@/layouts/Base.astro";
-import { collectionDateSort } from "@/utils/date";
 
-// Posts
-const MAX_POSTS = 10;
-const allPosts = await getAllPosts();
-const allPostsByDate = allPosts
-	.sort(collectionDateSort)
-	.slice(0, MAX_POSTS) as CollectionEntry<"post">[];
-
-// Notes
-const MAX_NOTES = 5;
-const allNotes = await getCollection("note");
-const latestNotes = allNotes.sort(collectionDateSort).slice(0, MAX_NOTES);
+const meta = { 
+	title: "Wongyun Yu - Academic Website",
+	description: "Wongyun Yu's personal academic website"
+};
 ---
 
-<PageLayout meta={{ title: "Home" }}>
-	<section>
-		<h1 class="title mb-6">Hello World!</h1>
-		<p class="mb-4">
-			Hi, I’m a theme for Astro, a simple starter that you can use to create your website or blog.
-			If you want to know more about how you can customise me, add more posts, and make it your own,
-			click on the GitHub icon link below and it will take you to my repo.
-		</p>
-		<SocialList />
+<PageLayout meta={meta}>
+	<!-- Navigation will be handled by the header component -->
+	
+	<!-- About Section -->
+	<section id="about" class="scroll-mt-20">
+		<!-- <h1 class="title mb-6">Hi! I'm Wongyun</h1> -->
+		<div class="prose prose-cactus max-w-none">
+			<p>
+			I am an M.S. student in Computer Vision at <a href="https://www.postech.ac.kr/eng/index.do" class="cactus-link" target="_blank" rel="noopener noreferrer">POSTECH</a>, 
+			advised by <a href="https://cvlab.postech.ac.kr/~mcho/" class="cactus-link" target="_blank" rel="noopener noreferrer"> Minsu Cho</a>, 
+			and a member of the <a href="https://cvlab.postech.ac.kr" class="cactus-link" target="_blank" rel="noopener noreferrer">Computer Vision Lab</a>. 
+			I received my B.S. in Electronic Engineering from <a href="https://www.ajou.ac.kr/en/index.do" class="cactus-link" target="_blank" rel="noopener noreferrer">Ajou University</a>, where I was advised by <a href="https://sites.google.com/view/ajoumspl/members" class="cactus-link" target="_blank" rel="noopener noreferrer">Yong Seok Heo</a>.
+			</p>
+			<p>
+			I have worked on symmetry detection, with ongoing interest in integrating physical constraints into neural networks for scene understanding and beyond.
+			</p>
+		</div>
 	</section>
-	<section class="mt-16">
-		<h2 class="title text-accent mb-6 text-xl"><a href="/posts/">Posts</a></h2>
-		<ul class="space-y-6" role="list">
-			{
-				allPostsByDate.map((p) => (
-					<li class="grid gap-2 sm:grid-cols-[auto_1fr]">
-						<PostPreview post={p} />
-					</li>
-				))
-			}
-		</ul>
+
+	<!-- News Section -->
+	<section id="news" class="mt-15 scroll-mt-20">
+		<h2 class="title text-2xl mb-6">News</h2>
+		<div class="border-l-4 border-accent pl-4">
+			<div class="mb-2">
+				<span class="text-sm text-gray-500">Jun 25, 2025</span>
+			</div>
+					<div class="mb-3">
+			<div class="mb-2 text-lg font-semibold text-accent">A paper on symmetry detection is accepted to <a href="https://iccv.thecvf.com" class="cactus-link" target="_blank" rel="noopener noreferrer">ICCV'25</a>.</div>
+			<!-- <div class="font-semibold text-lg">Axis-level Symmetry Detection with Group-Equivariant Representation</div> -->
+		</div>
+		<div class="flex gap-2">
+			<a href="https://201820894.github.io/axis_symdet/" target="_blank" rel="noopener noreferrer" class="border border-gray-300 dark:border-gray-600 rounded px-3 py-2 text-center hover:border-accent transition-colors cursor-pointer">
+				<div class="text-xs font-medium whitespace-nowrap">🌐 Project Page</div>
+			</a>
+			<div class="border border-gray-300 dark:border-gray-600 rounded px-3 py-2 text-center hover:border-accent transition-colors cursor-pointer">
+				<div class="text-xs font-medium whitespace-nowrap">📄 Paper (Coming Soon)</div>
+			</div>
+			
+			<div class="border border-gray-300 dark:border-gray-600 rounded px-3 py-2 text-center hover:border-accent transition-colors cursor-pointer">
+				<div class="text-xs font-medium whitespace-nowrap">💻 Code (Coming Soon)</div>
+			</div>
+		</div>
+		</div>
 	</section>
-	{
-		latestNotes.length > 0 && (
-			<section class="mt-16">
-				<h2 class="title text-accent mb-6 text-xl">
-					<a href="/notes/">Notes</a>
-				</h2>
-				<ul class="space-y-6" role="list">
-					{latestNotes.map((note) => (
-						<li>
-							<Note note={note} as="h3" isPreview />
-						</li>
-					))}
-				</ul>
-			</section>
-		)
-	}
+
+	<!-- Education Section -->
+	<section id="education" class="mt-20 scroll-mt-20">
+		<h2 class="title text-2xl mb-6">Education</h2>
+		<div class="space-y-6">
+
+			<div class="border-l-4 border-accent pl-4">
+				<h3 class="text-xl font-semibold">M.S. in Computer Vision</h3>
+				<p class="text-gray-600 dark:text-gray-400"><a href="https://www.postech.ac.kr/eng/index.do" class="cactus-link" target="_blank" rel="noopener noreferrer">POSTECH</a>, Pohang, South Korea</p>
+				<p class="text-sm text-gray-500">2024 - Present</p>
+				<p class="mt-2">GPA 3.87/4.3</p>
+			</div>
+			
+			<div class="border-l-4 border-accent pl-4">
+				<h3 class="text-xl font-semibold">B.S. in Electronic Engineering</h3>
+				<p class="text-gray-600 dark:text-gray-400"><a href="https://www.ajou.ac.kr/en/index.do" class="cactus-link" target="_blank" rel="noopener noreferrer">Ajou University</a>, Suwon, South Korea</p>
+				<p class="text-sm text-gray-500">2018 - 2023</p>
+				<p class="mt-2">GPA 4.34/4.5 (1/84)</p>
+			</div>
+		</div>
+	</section>
+
+
+	<!-- Publications Section -->
+	<section id="publications" class="mt-20 scroll-mt-20">
+		<h2 class="title text-2xl mb-6">Publications</h2>
+		<div class="space-y-8">
+			<!-- ICCV 2025 Paper -->
+			<div class="border-l-4 border-accent pl-4">
+				<!-- Teaser Image -->
+				<img 
+					src="publications/symdet.png" 
+					alt="Axis-level Symmetry Detection with Group-Equivariant Representation"
+					class="mb-4 rounded-lg h-58 w-full object-cover"
+				/>
+				
+				<!-- Paper Title -->
+				<div class="mb-3">
+					<div class="font-semibold text-lg">Axis-level Symmetry Detection with Group-Equivariant Representation</div>
+				</div>
+				
+				<!-- Authors -->
+				<div class="mb-2">
+					<span class="font-semibold">Wongyun Yu</span>, <a href="https://ahyunseo.github.io" class="cactus-link" target="_blank" rel="noopener noreferrer">Ahyun Seo</a>, and <a href="https://cvlab.postech.ac.kr/~mcho/" class="cactus-link" target="_blank" rel="noopener noreferrer">Minsu Cho</a>
+				</div>
+				
+				<!-- Conference -->
+				<div class="mb-4 text-gray-600 dark:text-gray-400">
+					International Conference on Computer Vision (ICCV), 2025
+				</div>
+				
+				<!-- Action Buttons -->
+				<div class="flex gap-2">
+					<a href="https://201820894.github.io/axis_symdet/" target="_blank" rel="noopener noreferrer" class="border border-gray-300 dark:border-gray-600 rounded px-3 py-2 text-center hover:border-accent transition-colors cursor-pointer">
+						<div class="text-xs font-medium whitespace-nowrap">🌐 Project Page</div>
+					</a>
+					<div class="border border-gray-300 dark:border-gray-600 rounded px-3 py-2 text-center hover:border-accent transition-colors cursor-pointer">
+						<div class="text-xs font-medium whitespace-nowrap">📄 Paper (Coming Soon)</div>
+					</div>
+					
+					<div class="border border-gray-300 dark:border-gray-600 rounded px-3 py-2 text-center hover:border-accent transition-colors cursor-pointer">
+						<div class="text-xs font-medium whitespace-nowrap">💻 Code (Coming Soon)</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- IEEE Access 2023 Paper -->
+			<div class="border-l-4 border-accent pl-4">
+				<!-- Paper Title -->
+				<div class="mb-3">
+					<div class="font-semibold text-lg">Adaptive Momentum-based Loss Rebalancing for Monocular Depth Estimation</div>
+				</div>
+				
+				<!-- Authors -->
+				<div class="mb-2">
+					<span class="font-semibold">Wongyun Yu</span> and <a href="https://sites.google.com/view/ajoumspl/members" class="cactus-link" target="_blank" rel="noopener noreferrer">Yong Seok Heo</a>
+				</div>
+				
+				<!-- Journal -->
+				<div class="mb-4 text-gray-600 dark:text-gray-400">
+					IEEE Access, 2023.10
+				</div>
+				
+				<!-- Action Buttons -->
+				<div class="flex gap-2">
+					<a href="https://ieeexplore.ieee.org/document/10287335" target="_blank" rel="noopener noreferrer" class="border border-gray-300 dark:border-gray-600 rounded px-3 py-2 text-center hover:border-accent transition-colors cursor-pointer">
+						<div class="text-xs font-medium whitespace-nowrap">📄 Paper</div>
+					</a>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Awards Section -->
+	<section id="honors" class="mt-20 scroll-mt-20 mb-20">
+		<h2 class="title text-2xl mb-6">Awards</h2>	
+		<div class="space-y-4">
+			<div class="border-l-4 border-accent pl-4">
+				<h3 class="text-lg font-semibold">Gwanjung Educational Scholarship</h3>
+				<p class="text-gray-600 dark:text-gray-400">Gwanjung Educational Foundation</p>
+				<p class="text-sm text-gray-500">2024.03 - 2026.02</p>
+				<p class="mt-2">Full tuition support for M.S. course (~$18,000)</p>
+			</div>
+		</div>
+	</section>
 </PageLayout>
+
+<style>
+	/* Smooth scrolling */
+	html {
+		scroll-behavior: smooth;
+	}
+	
+	/* Offset for sticky header when scrolling to anchors - adjusted for new header padding */
+	.scroll-mt-20 {
+		scroll-margin-top: 13rem;
+	}
+</style>
+
+<script>
+	// Function to force scroll to absolute top - no conditions
+	function forceScrollToTop() {
+		// Always force scroll to the very top (0,0) regardless of hash
+		window.scrollTo(0, 0);
+		document.documentElement.scrollTop = 0;
+		document.body.scrollTop = 0;
+		
+		// Additional safety check
+		if (window.pageYOffset !== 0 || document.documentElement.scrollTop !== 0) {
+			document.documentElement.style.scrollBehavior = 'auto';
+			window.scrollTo(0, 0);
+			document.documentElement.style.scrollBehavior = '';
+		}
+	}
+
+	// Immediate scroll to top - before DOMContentLoaded
+	forceScrollToTop();
+
+	// Enhanced smooth scrolling for anchor links
+	document.addEventListener('DOMContentLoaded', function() {
+		// Always scroll to top on initial load, regardless of hash
+		forceScrollToTop();
+		
+		// Multiple safety scrolls for initial load
+		setTimeout(forceScrollToTop, 10);
+		setTimeout(forceScrollToTop, 50);
+		setTimeout(forceScrollToTop, 100);
+		
+		const anchorLinks = document.querySelectorAll('a[href^="#"]');
+		
+		anchorLinks.forEach(link => {
+			link.addEventListener('click', function(e) {
+				e.preventDefault();
+				const targetId = (e.currentTarget as HTMLAnchorElement).getAttribute('href');
+				const targetElement = document.querySelector(targetId!);
+				
+				if (targetElement) {
+					targetElement.scrollIntoView({
+						behavior: 'smooth',
+						block: 'start'
+					});
+				}
+			});
+		});
+	});
+
+	// Prevent browser from restoring scroll position
+	if ('scrollRestoration' in history) {
+		history.scrollRestoration = 'manual';
+	}
+
+	// Additional safety for page load
+	window.addEventListener('load', forceScrollToTop);
+	window.addEventListener('pageshow', forceScrollToTop);
+
+	// Handle hot reload (Astro development) - ALWAYS scroll to top
+	if (import.meta.hot) {
+		import.meta.hot.on('astro:afterUpdate', () => {
+			// Multiple attempts to force scroll to top during hot reload
+			forceScrollToTop();
+			setTimeout(forceScrollToTop, 10);
+			setTimeout(forceScrollToTop, 50);
+			setTimeout(forceScrollToTop, 100);
+			requestAnimationFrame(() => {
+				forceScrollToTop();
+				setTimeout(forceScrollToTop, 10);
+			});
+		});
+	}
+
+	// Hot reload detection for development (only during file changes)
+	let isHotReloading = false;
+	if (import.meta.hot) {
+		let lastBodyHeight = document.body.scrollHeight;
+		setInterval(() => {
+			// Only check during development and when hot reloading
+			if (isHotReloading) {
+				const currentBodyHeight = document.body.scrollHeight;
+				if (currentBodyHeight !== lastBodyHeight) {
+					forceScrollToTop();
+					lastBodyHeight = currentBodyHeight;
+					isHotReloading = false; // Reset flag
+				}
+			}
+		}, 200);
+
+		// Set hot reload flag when Astro updates
+		import.meta.hot.on('astro:afterUpdate', () => {
+			isHotReloading = true;
+		});
+	}
+</script>
