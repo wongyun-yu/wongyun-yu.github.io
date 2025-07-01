@@ -121,14 +121,14 @@ const socialLinks: {
 		<button
 			aria-expanded="false"
 			aria-haspopup="menu"
-			class="group relative ms-4 h-7 w-7 sm:invisible sm:hidden"
+			class="relative ms-4 h-7 w-7 sm:invisible sm:hidden"
 			id="toggle-navigation-menu"
 			type="button"
 		>
 			<span class="sr-only">Open main menu</span>
 			<svg
 				aria-hidden="true"
-				class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 transition-all group-aria-expanded:scale-0 group-aria-expanded:opacity-0"
+				class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 transition-all"
 				fill="none"
 				focusable="false"
 				id="line-svg"
@@ -142,7 +142,7 @@ const socialLinks: {
 			</svg>
 			<svg
 				aria-hidden="true"
-				class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 scale-0 opacity-0 transition-all group-aria-expanded:scale-100 group-aria-expanded:opacity-100"
+				class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 scale-0 opacity-0 transition-all"
 				fill="none"
 				focusable="false"
 				id="cross-svg"
@@ -166,11 +166,24 @@ const socialLinks: {
 		connectedCallback() {
 			const headerEl = document.getElementById("main-header")!;
 			const mobileButtonEl = this.querySelector<HTMLButtonElement>("button");
+			const lineSvg = this.querySelector<SVGElement>("#line-svg");
+			const crossSvg = this.querySelector<SVGElement>("#cross-svg");
 
 			mobileButtonEl?.addEventListener("click", () => {
 				if (headerEl) toggleClass(headerEl, "menu-open");
 				this.#menuOpen = !this.#menuOpen;
 				mobileButtonEl.setAttribute("aria-expanded", this.#menuOpen.toString());
+				
+				// Toggle SVG visibility
+				if (lineSvg && crossSvg) {
+					if (this.#menuOpen) {
+						lineSvg.classList.add("scale-0", "opacity-0");
+						crossSvg.classList.remove("scale-0", "opacity-0");
+					} else {
+						lineSvg.classList.remove("scale-0", "opacity-0");
+						crossSvg.classList.add("scale-0", "opacity-0");
+					}
+				}
 			});
 		}
 	}
