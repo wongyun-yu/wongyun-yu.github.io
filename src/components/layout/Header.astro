@@ -96,86 +96,90 @@ const socialLinks: {
 	<div class="flex items-center gap-x-3 ml-auto">
 		<Search />
 		<ThemeToggle />
-	</div>
-	<!-- Mobile Social Links -->
-	<div class="flex items-center gap-x-2 mt-2 sm:hidden">
-		{
-			socialLinks.map(({ friendlyName, isWebmention, link, name }) => (
-				<a
-					class="hover:text-link inline-block opacity-70 hover:opacity-100 transition-opacity"
-					href={link}
-					rel={`noreferrer ${isWebmention ? "me authn" : ""}`}
-					target="_blank"
-				>
-					<Icon aria-hidden="true" class="h-5 w-5" focusable="false" name={name} />
-					<span class="sr-only">{friendlyName}</span>
-				</a>
-			))
-		}
-	</div>
-	<button
-		aria-expanded="false"
-		aria-haspopup="menu"
-		class="relative ms-4 h-7 w-7 sm:hidden"
-		id="toggle-navigation-menu"
-		type="button"
-	>
-		<span class="sr-only">Open main menu</span>
-		<svg
-			aria-hidden="true"
-			class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 transition-all"
-			fill="none"
-			focusable="false"
-			id="line-svg"
-			stroke="currentColor"
-			stroke-width="1.5"
-			viewBox="0 0 24 24"
-			xmlns="http://www.w3.org/2000/svg"
+		<!-- Mobile Social Links -->
+		<div class="flex items-center gap-x-2 sm:hidden">
+			{
+				socialLinks.map(({ friendlyName, isWebmention, link, name }) => (
+					<a
+						class="hover:text-link inline-block opacity-70 hover:opacity-100 transition-opacity"
+						href={link}
+						rel={`noreferrer ${isWebmention ? "me authn" : ""}`}
+						target="_blank"
+					>
+						<Icon aria-hidden="true" class="h-5 w-5" focusable="false" name={name} />
+						<span class="sr-only">{friendlyName}</span>
+					</a>
+				))
+			}
+		</div>
+				<button
+			aria-expanded="false"
+			aria-haspopup="menu"
+			class="relative ms-4 h-7 w-7 sm:hidden"
+			id="toggle-navigation-menu"
+			type="button"
 		>
-			<path d="M3.75 9h16.5m-16.5 6.75h16.5" stroke-linecap="round" stroke-linejoin="round"
-			></path>
-		</svg>
-		<svg
-			aria-hidden="true"
-			class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 scale-0 opacity-0 transition-all"
-			fill="none"
-			focusable="false"
-			id="cross-svg"
-			stroke="currentColor"
-			stroke-width="1.5"
-			viewBox="0 0 24 24"
-			xmlns="http://www.w3.org/2000/svg"
-		>
-			<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path>
-		</svg>
-	</button>
+			<span class="sr-only">Open main menu</span>
+			<svg
+				aria-hidden="true"
+				class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 transition-all"
+				fill="none"
+				focusable="false"
+				id="line-svg"
+				stroke="currentColor"
+				stroke-width="1.5"
+				viewBox="0 0 24 24"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path d="M3.75 9h16.5m-16.5 6.75h16.5" stroke-linecap="round" stroke-linejoin="round"
+				></path>
+			</svg>
+			<svg
+				aria-hidden="true"
+				class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 scale-0 opacity-0 transition-all"
+				fill="none"
+				focusable="false"
+				id="cross-svg"
+				stroke="currentColor"
+				stroke-width="1.5"
+				viewBox="0 0 24 24"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path>
+			</svg>
+		</button>
+	</div>
 </header>
 
 <script>
 	import { toggleClass } from "@/utils/domElement";
 
 	document.addEventListener('DOMContentLoaded', () => {
-		const headerEl = document.getElementById("main-header")!;
+		const headerEl = document.getElementById("main-header");
 		const mobileButtonEl = document.getElementById("toggle-navigation-menu") as HTMLButtonElement;
-		const lineSvg = document.getElementById("line-svg") as HTMLElement;
-		const crossSvg = document.getElementById("cross-svg") as HTMLElement;
+		const lineSvg = document.getElementById("line-svg");
+		const crossSvg = document.getElementById("cross-svg");
 		let menuOpen = false;
 
-		mobileButtonEl?.addEventListener("click", () => {
-			if (headerEl) toggleClass(headerEl, "menu-open");
-			menuOpen = !menuOpen;
-			mobileButtonEl.setAttribute("aria-expanded", menuOpen.toString());
-			
-			// Toggle SVG visibility
-			if (lineSvg && crossSvg) {
+		if (mobileButtonEl && headerEl && lineSvg && crossSvg) {
+			mobileButtonEl.addEventListener("click", () => {
+				toggleClass(headerEl, "menu-open");
+				menuOpen = !menuOpen;
+				mobileButtonEl.setAttribute("aria-expanded", menuOpen.toString());
+				
+				// Toggle SVG visibility
 				if (menuOpen) {
-					lineSvg.classList.add("scale-0", "opacity-0");
-					crossSvg.classList.remove("scale-0", "opacity-0");
+					lineSvg.style.transform = "scale(0)";
+					lineSvg.style.opacity = "0";
+					crossSvg.style.transform = "scale(1)";
+					crossSvg.style.opacity = "1";
 				} else {
-					lineSvg.classList.remove("scale-0", "opacity-0");
-					crossSvg.classList.add("scale-0", "opacity-0");
+					lineSvg.style.transform = "scale(1)";
+					lineSvg.style.opacity = "1";
+					crossSvg.style.transform = "scale(0)";
+					crossSvg.style.opacity = "0";
 				}
-			}
-		});
+			});
+		}
 	});
 </script>
