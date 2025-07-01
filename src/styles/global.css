@@ -132,3 +132,8 @@
 	--tw-prose-quotes: var(--color-quote);
 	--tw-prose-th-borders: #666;
 }
+
+/* 고정 헤더 높이만큼 여백을 둬서 앵커 클릭 시 제목이 가려지지 않게 함 */
+[id] {
+	scroll-margin-top: 80px; /* 헤더 높이에 맞게 px 또는 rem 단위로 조정 */
+}
