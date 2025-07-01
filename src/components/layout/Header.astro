@@ -18,7 +18,7 @@ const socialLinks: {
 	},
 	{
 		friendlyName: "Github",
-		link: "https://github.com/201820894",
+		link: "https://github.com/wongyun-yu",
 		name: "mdi:github",
 	},
 	{
@@ -96,93 +96,86 @@ const socialLinks: {
 	<div class="flex items-center gap-x-3 ml-auto">
 		<Search />
 		<ThemeToggle />
-		<!-- Mobile Social Links -->
-		<div class="flex items-center gap-x-2 sm:hidden">
-			{
-				socialLinks.map(({ friendlyName, isWebmention, link, name }) => (
-					<a
-						class="hover:text-link inline-block opacity-70 hover:opacity-100 transition-opacity"
-						href={link}
-						rel={`noreferrer ${isWebmention ? "me authn" : ""}`}
-						target="_blank"
-					>
-						<Icon aria-hidden="true" class="h-5 w-5" focusable="false" name={name} />
-						<span class="sr-only">{friendlyName}</span>
-					</a>
-				))
-			}
-		</div>
 	</div>
-	<mobile-button>
-		<button
-			aria-expanded="false"
-			aria-haspopup="menu"
-			class="relative ms-4 h-7 w-7 sm:hidden"
-			id="toggle-navigation-menu"
-			type="button"
+	<!-- Mobile Social Links -->
+	<div class="flex items-center gap-x-2 mt-2 sm:hidden">
+		{
+			socialLinks.map(({ friendlyName, isWebmention, link, name }) => (
+				<a
+					class="hover:text-link inline-block opacity-70 hover:opacity-100 transition-opacity"
+					href={link}
+					rel={`noreferrer ${isWebmention ? "me authn" : ""}`}
+					target="_blank"
+				>
+					<Icon aria-hidden="true" class="h-5 w-5" focusable="false" name={name} />
+					<span class="sr-only">{friendlyName}</span>
+				</a>
+			))
+		}
+	</div>
+	<button
+		aria-expanded="false"
+		aria-haspopup="menu"
+		class="relative ms-4 h-7 w-7 sm:hidden"
+		id="toggle-navigation-menu"
+		type="button"
+	>
+		<span class="sr-only">Open main menu</span>
+		<svg
+			aria-hidden="true"
+			class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 transition-all"
+			fill="none"
+			focusable="false"
+			id="line-svg"
+			stroke="currentColor"
+			stroke-width="1.5"
+			viewBox="0 0 24 24"
+			xmlns="http://www.w3.org/2000/svg"
 		>
-			<span class="sr-only">Open main menu</span>
-			<svg
-				aria-hidden="true"
-				class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 transition-all"
-				fill="none"
-				focusable="false"
-				id="line-svg"
-				stroke="currentColor"
-				stroke-width="1.5"
-				viewBox="0 0 24 24"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<path d="M3.75 9h16.5m-16.5 6.75h16.5" stroke-linecap="round" stroke-linejoin="round"
-				></path>
-			</svg>
-			<svg
-				aria-hidden="true"
-				class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 scale-0 opacity-0 transition-all"
-				fill="none"
-				focusable="false"
-				id="cross-svg"
-				stroke="currentColor"
-				stroke-width="1.5"
-				viewBox="0 0 24 24"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path>
-			</svg>
-		</button>
-	</mobile-button>
+			<path d="M3.75 9h16.5m-16.5 6.75h16.5" stroke-linecap="round" stroke-linejoin="round"
+			></path>
+		</svg>
+		<svg
+			aria-hidden="true"
+			class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 scale-0 opacity-0 transition-all"
+			fill="none"
+			focusable="false"
+			id="cross-svg"
+			stroke="currentColor"
+			stroke-width="1.5"
+			viewBox="0 0 24 24"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path>
+		</svg>
+	</button>
 </header>
 
 <script>
 	import { toggleClass } from "@/utils/domElement";
 
-	class MobileNavBtn extends HTMLElement {
-		#menuOpen: boolean = false;
+	document.addEventListener('DOMContentLoaded', () => {
+		const headerEl = document.getElementById("main-header")!;
+		const mobileButtonEl = document.getElementById("toggle-navigation-menu") as HTMLButtonElement;
+		const lineSvg = document.getElementById("line-svg") as HTMLElement;
+		const crossSvg = document.getElementById("cross-svg") as HTMLElement;
+		let menuOpen = false;
 
-		connectedCallback() {
-			const headerEl = document.getElementById("main-header")!;
-			const mobileButtonEl = this.querySelector<HTMLButtonElement>("button");
-			const lineSvg = this.querySelector<SVGElement>("#line-svg");
-			const crossSvg = this.querySelector<SVGElement>("#cross-svg");
-
-			mobileButtonEl?.addEventListener("click", () => {
-				if (headerEl) toggleClass(headerEl, "menu-open");
-				this.#menuOpen = !this.#menuOpen;
-				mobileButtonEl.setAttribute("aria-expanded", this.#menuOpen.toString());
-				
-				// Toggle SVG visibility
-				if (lineSvg && crossSvg) {
-					if (this.#menuOpen) {
-						lineSvg.classList.add("scale-0", "opacity-0");
-						crossSvg.classList.remove("scale-0", "opacity-0");
-					} else {
-						lineSvg.classList.remove("scale-0", "opacity-0");
-						crossSvg.classList.add("scale-0", "opacity-0");
-					}
+		mobileButtonEl?.addEventListener("click", () => {
+			if (headerEl) toggleClass(headerEl, "menu-open");
+			menuOpen = !menuOpen;
+			mobileButtonEl.setAttribute("aria-expanded", menuOpen.toString());
+			
+			// Toggle SVG visibility
+			if (lineSvg && crossSvg) {
+				if (menuOpen) {
+					lineSvg.classList.add("scale-0", "opacity-0");
+					crossSvg.classList.remove("scale-0", "opacity-0");
+				} else {
+					lineSvg.classList.remove("scale-0", "opacity-0");
+					crossSvg.classList.add("scale-0", "opacity-0");
 				}
-			});
-		}
-	}
-
-	customElements.define("mobile-button", MobileNavBtn);
+			}
+		});
+	});
 </script>
