@@ -40,68 +40,67 @@ const socialLinks: {
 ];
 ---
 
-<header class="group sticky top-0 z-50 mb-10 flex flex-col sm:flex-row sm:items-center bg-global-bg/60 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 pt-8 sm:pt-16 pb-3 -mx-4 px-4 sm:mx-0 sm:px-0 sm:ps-18" id="main-header">
-	<!-- 모바일 전용 메뉴 바 (맨 위로) -->
-	<div class="flex flex-row items-center justify-end w-full flex-nowrap gap-x-2 sm:hidden mb-2">
-		<!-- 오른쪽: 메뉴 (모바일에서만 보임) -->
-		<div class="flex items-center gap-x-1 flex-shrink-0">
-			<button
-				aria-expanded="false"
-				aria-haspopup="menu"
-				class="relative h-7 w-7 text-accent"
-				id="toggle-navigation-menu"
-				type="button"
-			>
-				<span class="sr-only">Open main menu</span>
-				<svg
-					aria-hidden="true"
-					id="line-svg"
-					class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 transition-all"
-					style="z-index:20;background:transparent;display:block;visibility:visible;pointer-events:auto;"
-					fill="none"
-					focusable="false"
-					stroke="currentColor"
-					stroke-width="2"
-					viewBox="0 0 24 24"
-					xmlns="http://www.w3.org/2000/svg"
-				>
-					<path d="M3.75 9h16.5m-16.5 6.75h16.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/>
-				</svg>
-				<svg
-					aria-hidden="true"
-					id="cross-svg"
-					class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 transition-all"
-					style="z-index:21;background:transparent;display:none;visibility:hidden;pointer-events:none;"
-					fill="none"
-					focusable="false"
-					stroke="currentColor"
-					stroke-width="2"
-					viewBox="0 0 24 24"
-					xmlns="http://www.w3.org/2000/svg"
-				>
-					<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/>
-				</svg>
-			</button>
-		</div>
-	</div>
+<header class="group sticky top-0 z-50 mb-10 flex flex-col sm:flex-row sm:items-center bg-global-bg/60 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 pt-5 sm:pt-16 pb-3 -mx-4 px-4 sm:mx-0 sm:px-0 sm:ps-18" id="main-header">
 	<!-- 프로필 및 이름 섹션 -->
 	<div class="flex sm:flex-col">
-		<a
-			aria-current={Astro.url.pathname === "/" ? "page" : false}
-			class="inline-flex items-start hover:opacity-80 transition-opacity sm:relative sm:inline-block"
-			href="/"
-		>
-			<img
-				src="/profile.jpg"
-				alt="Wongyun Yu Profile"
-				class="me-12 h-24 w-24 aspect-square self-start sm:absolute sm:-start-22 sm:-top-4 sm:me-0 sm:h-28 sm:w-28 rounded-full object-cover border-2 border-accent"
-			/>
-			<span class="text-2xl font-bold sm:text-3xl sm:ml-9 sm:-mt-12 sm:relative sm:-top-2 mt-6 sm:mt-0">{siteConfig.title}</span>
-		</a>
+		<div class="flex items-center justify-between w-full sm:justify-start">
+			<a
+				aria-current={Astro.url.pathname === "/" ? "page" : false}
+				class="inline-flex items-start hover:opacity-80 transition-opacity sm:relative sm:inline-block"
+				href="/"
+			>
+				<img
+					src="/profile.jpg"
+					alt="Wongyun Yu Profile"
+					class="me-12 h-24 w-24 aspect-square self-start sm:absolute sm:-start-22 sm:-top-4 sm:me-0 sm:h-28 sm:w-28 rounded-full object-cover border-2 border-accent"
+				/>
+				<span class="text-2xl font-bold sm:text-3xl sm:ml-9 sm:-mt-12 sm:relative sm:-top-2 mt-6 sm:mt-0">{siteConfig.title}</span>
+			</a>
+			<!-- 모바일 메뉴 버튼 (이름과 같은 줄) -->
+			<div class="flex items-center gap-x-1 flex-shrink-0 sm:hidden">
+				<button
+					aria-expanded="false"
+					aria-haspopup="menu"
+					class="relative h-7 w-7 text-accent"
+					id="toggle-navigation-menu"
+					type="button"
+				>
+					<span class="sr-only">Open main menu</span>
+					<svg
+						aria-hidden="true"
+						id="line-svg"
+						class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 transition-all"
+						style="z-index:20;background:transparent;display:block;visibility:visible;pointer-events:auto;"
+						fill="none"
+						focusable="false"
+						stroke="currentColor"
+						stroke-width="2"
+						viewBox="0 0 24 24"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<path d="M3.75 9h16.5m-16.5 6.75h16.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/>
+					</svg>
+					<svg
+						aria-hidden="true"
+						id="cross-svg"
+						class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 transition-all"
+						style="z-index:21;background:transparent;display:none;visibility:hidden;pointer-events:none;"
+						fill="none"
+						focusable="false"
+						stroke="currentColor"
+						stroke-width="2"
+						viewBox="0 0 24 24"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/>
+					</svg>
+				</button>
+			</div>
+		</div>
 
 		<nav
 			aria-label="Main menu"
-			class="bg-global-bg/95 text-accent sm:divide-accent fixed left-0 right-0 top-16 mx-0 hidden flex-col items-end gap-y-4 rounded-none py-4 px-4 shadow backdrop-blur-md group-[.menu-open]:z-50 group-[.menu-open]:flex sm:static sm:z-auto sm:ms-6 sm:mt-2.5 sm:transform sm:-translate-y-1 sm:flex sm:flex-row sm:items-center sm:divide-x sm:rounded-none sm:bg-transparent sm:py-0 sm:px-0 sm:shadow-none sm:backdrop-blur-none"
+			class="bg-global-bg/95 text-accent sm:divide-accent fixed left-0 right-0 top-20 mx-0 hidden flex-col items-end gap-y-4 rounded-none py-4 px-4 shadow backdrop-blur-md group-[.menu-open]:z-50 group-[.menu-open]:flex sm:static sm:z-auto sm:ms-6 sm:mt-2.5 sm:transform sm:-translate-y-1 sm:flex sm:flex-row sm:items-center sm:divide-x sm:rounded-none sm:bg-transparent sm:py-0 sm:px-0 sm:shadow-none sm:backdrop-blur-none"
 			id="navigation-menu"
 		>
 			{
