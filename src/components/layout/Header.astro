@@ -93,11 +93,10 @@ const socialLinks: {
 			</ul>
 		</div>
 	</div>
-	<div class="flex items-center gap-x-3 ml-auto">
-		<Search />
-		<ThemeToggle />
-		<!-- Mobile Social Links -->
-		<div class="flex items-center gap-x-2 sm:hidden">
+	<!-- 모바일 전용 헤더 바 -->
+	<div class="flex flex-row items-center justify-between w-full flex-nowrap gap-x-2 sm:hidden mt-2">
+		<!-- 소셜 아이콘 -->
+		<div class="flex items-center gap-x-2 flex-shrink-0">
 			{
 				socialLinks.map(({ friendlyName, isWebmention, link, name }) => (
 					<a
@@ -112,42 +111,72 @@ const socialLinks: {
 				))
 			}
 		</div>
-				<button
-			aria-expanded="false"
-			aria-haspopup="menu"
-			class="relative ms-4 h-7 w-7 sm:hidden"
-			id="toggle-navigation-menu"
-			type="button"
-		>
-			<span class="sr-only">Open main menu</span>
-			<svg
-				aria-hidden="true"
-				class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 transition-all"
-				fill="none"
-				focusable="false"
-				id="line-svg"
-				stroke="currentColor"
-				stroke-width="1.5"
-				viewBox="0 0 24 24"
-				xmlns="http://www.w3.org/2000/svg"
+		<!-- 오른쪽: 라이트/다크, 메뉴, 검색 -->
+		<div class="flex items-center gap-x-1 flex-shrink-0">
+			<ThemeToggle />
+			<button
+				aria-expanded="false"
+				aria-haspopup="menu"
+				class="fixed top-4 right-4 h-10 w-10 z-50 text-accent bg-global-bg rounded-full flex items-center justify-center shadow-lg sm:hidden"
+				id="toggle-navigation-menu"
+				type="button"
+				style="transition:all 0.2s;"
 			>
-				<path d="M3.75 9h16.5m-16.5 6.75h16.5" stroke-linecap="round" stroke-linejoin="round"
-				></path>
-			</svg>
-			<svg
-				aria-hidden="true"
-				class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 scale-0 opacity-0 transition-all"
-				fill="none"
-				focusable="false"
-				id="cross-svg"
-				stroke="currentColor"
-				stroke-width="1.5"
-				viewBox="0 0 24 24"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"></path>
-			</svg>
-		</button>
+				<span class="sr-only">Open main menu</span>
+				<svg
+					aria-hidden="true"
+					id="line-svg"
+					class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 transition-all"
+					style="z-index:20;background:transparent;display:block;visibility:visible;pointer-events:auto;"
+					fill="none"
+					focusable="false"
+					stroke="currentColor"
+					stroke-width="2"
+					viewBox="0 0 24 24"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path d="M3.75 9h16.5m-16.5 6.75h16.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/>
+				</svg>
+				<svg
+					aria-hidden="true"
+					id="cross-svg"
+					class="absolute start-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 transition-all"
+					style="z-index:21;background:transparent;display:none;visibility:hidden;pointer-events:none;"
+					fill="none"
+					focusable="false"
+					stroke="currentColor"
+					stroke-width="2"
+					viewBox="0 0 24 24"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/>
+				</svg>
+			</button>
+			<div class="min-w-0">
+				<Search />
+			</div>
+		</div>
+	</div>
+	<!-- 데스크톱용 기존 헤더 바 -->
+	<div class="flex items-center gap-x-3 ml-auto hidden sm:flex">
+		<Search />
+		<ThemeToggle />
+		<!-- 소셜 아이콘 -->
+		<div class="flex items-center gap-x-2">
+			{
+				socialLinks.map(({ friendlyName, isWebmention, link, name }) => (
+					<a
+						class="hover:text-link inline-block opacity-70 hover:opacity-100 transition-opacity"
+						href={link}
+						rel={`noreferrer ${isWebmention ? "me authn" : ""}`}
+						target="_blank"
+					>
+						<Icon aria-hidden="true" class="h-5 w-5 sm:h-6 sm:w-6" focusable="false" name={name} />
+						<span class="sr-only">{friendlyName}</span>
+					</a>
+				))
+			}
+		</div>
 	</div>
 </header>
 
@@ -161,25 +190,36 @@ const socialLinks: {
 		const crossSvg = document.getElementById("cross-svg");
 		let menuOpen = false;
 
+		console.log("Mobile menu elements:", { mobileButtonEl, lineSvg, crossSvg });
+
 		if (mobileButtonEl && headerEl && lineSvg && crossSvg) {
 			mobileButtonEl.addEventListener("click", () => {
+				console.log("Menu button clicked, current state:", menuOpen);
+				
 				toggleClass(headerEl, "menu-open");
 				menuOpen = !menuOpen;
 				mobileButtonEl.setAttribute("aria-expanded", menuOpen.toString());
 				
-				// Toggle SVG visibility
 				if (menuOpen) {
-					lineSvg.style.transform = "scale(0)";
-					lineSvg.style.opacity = "0";
-					crossSvg.style.transform = "scale(1)";
-					crossSvg.style.opacity = "1";
+					console.log("Showing X icon");
+					lineSvg.style.display = "none";
+					lineSvg.style.visibility = "hidden";
+					lineSvg.style.pointerEvents = "none";
+					crossSvg.style.display = "block";
+					crossSvg.style.visibility = "visible";
+					crossSvg.style.pointerEvents = "auto";
 				} else {
-					lineSvg.style.transform = "scale(1)";
-					lineSvg.style.opacity = "1";
-					crossSvg.style.transform = "scale(0)";
-					crossSvg.style.opacity = "0";
+					console.log("Showing hamburger icon");
+					lineSvg.style.display = "block";
+					lineSvg.style.visibility = "visible";
+					lineSvg.style.pointerEvents = "auto";
+					crossSvg.style.display = "none";
+					crossSvg.style.visibility = "hidden";
+					crossSvg.style.pointerEvents = "none";
 				}
 			});
+		} else {
+			console.error("Some mobile menu elements not found:", { mobileButtonEl, lineSvg, crossSvg });
 		}
 	});
 </script>
