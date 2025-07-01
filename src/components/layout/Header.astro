@@ -40,7 +40,7 @@ const socialLinks: {
 ];
 ---
 
-<header class="group sticky top-0 z-50 mb-10 flex items-center bg-global-bg/60 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 pt-8 sm:pt-16 pb-3 -mx-4 px-4 sm:mx-0 sm:px-0 sm:ps-18" id="main-header">
+<header class="group sticky top-0 z-50 mb-10 flex flex-col sm:flex-row sm:items-center bg-global-bg/60 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 pt-8 sm:pt-16 pb-3 -mx-4 px-4 sm:mx-0 sm:px-0 sm:ps-18" id="main-header">
 	<div class="flex sm:flex-col">
 		<a
 			aria-current={Astro.url.pathname === "/" ? "page" : false}
@@ -73,7 +73,7 @@ const socialLinks: {
 			}
 		</nav>
 		<!-- Social Links below navigation -->
-		<div class="flex justify-start ml-2 mt-2 sm:ml-9 sm:mt-2 sm:transform sm:translate-y-0.1">
+		<div class="hidden sm:flex sm:justify-start sm:ml-9 sm:mt-2 sm:transform sm:translate-y-0.1">
 			<ul class="flex items-center gap-x-2">
 				{
 					socialLinks.map(({ friendlyName, isWebmention, link, name }) => (
@@ -96,6 +96,26 @@ const socialLinks: {
 	<div class="flex items-center gap-x-3 ml-auto">
 		<Search />
 		<ThemeToggle />
+	</div>
+	<!-- Mobile Social Links -->
+	<div class="flex justify-center mt-4 sm:hidden">
+		<ul class="flex items-center gap-x-4">
+			{
+				socialLinks.map(({ friendlyName, isWebmention, link, name }) => (
+					<li class="flex">
+						<a
+							class="hover:text-link inline-block opacity-70 hover:opacity-100 transition-opacity"
+							href={link}
+							rel={`noreferrer ${isWebmention ? "me authn" : ""}`}
+							target="_blank"
+						>
+							<Icon aria-hidden="true" class="h-6 w-6" focusable="false" name={name} />
+							<span class="sr-only">{friendlyName}</span>
+						</a>
+					</li>
+				))
+			}
+		</ul>
 	</div>
 	<mobile-button>
 		<button
