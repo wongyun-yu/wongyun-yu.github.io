@@ -54,26 +54,6 @@ const socialLinks: {
 			/>
 			<span class="text-2xl font-bold sm:text-3xl sm:ml-9 sm:-mt-12 sm:relative sm:-top-2">{siteConfig.title}</span>
 		</a>
-		<!-- Mobile Social Links -->
-		<div class="flex justify-start ml-2 mt-2 sm:hidden">
-			<ul class="flex items-center gap-x-3">
-				{
-					socialLinks.map(({ friendlyName, isWebmention, link, name }) => (
-						<li class="flex">
-							<a
-								class="hover:text-link inline-block opacity-70 hover:opacity-100 transition-opacity"
-								href={link}
-								rel={`noreferrer ${isWebmention ? "me authn" : ""}`}
-								target="_blank"
-							>
-								<Icon aria-hidden="true" class="h-5 w-5" focusable="false" name={name} />
-								<span class="sr-only">{friendlyName}</span>
-							</a>
-						</li>
-					))
-				}
-			</ul>
-		</div>
 		<nav
 			aria-label="Main menu"
 			class="bg-global-bg/95 text-accent sm:divide-accent fixed left-0 right-0 top-32 mx-0 hidden flex-col items-end gap-y-4 rounded-none py-4 px-4 shadow backdrop-blur-md group-[.menu-open]:z-50 group-[.menu-open]:flex sm:static sm:z-auto sm:ms-6 sm:mt-2.5 sm:transform sm:-translate-y-1 sm:flex sm:flex-row sm:items-center sm:divide-x sm:rounded-none sm:bg-transparent sm:py-0 sm:px-0 sm:shadow-none sm:backdrop-blur-none"
@@ -116,12 +96,28 @@ const socialLinks: {
 	<div class="flex items-center gap-x-3 ml-auto">
 		<Search />
 		<ThemeToggle />
+		<!-- Mobile Social Links -->
+		<div class="flex items-center gap-x-2 sm:hidden">
+			{
+				socialLinks.map(({ friendlyName, isWebmention, link, name }) => (
+					<a
+						class="hover:text-link inline-block opacity-70 hover:opacity-100 transition-opacity"
+						href={link}
+						rel={`noreferrer ${isWebmention ? "me authn" : ""}`}
+						target="_blank"
+					>
+						<Icon aria-hidden="true" class="h-5 w-5" focusable="false" name={name} />
+						<span class="sr-only">{friendlyName}</span>
+					</a>
+				))
+			}
+		</div>
 	</div>
 	<mobile-button>
 		<button
 			aria-expanded="false"
 			aria-haspopup="menu"
-			class="relative ms-4 h-7 w-7 sm:invisible sm:hidden"
+			class="relative ms-4 h-7 w-7 sm:hidden"
 			id="toggle-navigation-menu"
 			type="button"
 		>
