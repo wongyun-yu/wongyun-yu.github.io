@@ -40,11 +40,19 @@ import "@/styles/blocks/search.css";
 			>
 			{
 				import.meta.env.DEV ? (
-					<div class="mx-auto text-center">
-						<p>
-							Search is only available in production builds. <br />
-							Try building and previewing the site to test it out locally.
-						</p>
+					<div class="search-container">
+						<div class="relative">
+							<input
+								type="text"
+								placeholder="Search (dev mode - limited functionality)..."
+								class="w-full px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+								id="dev-search-input"
+							/>
+							<div class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+								<p>Note: Full search functionality is only available in production builds.</p>
+								<p>Try building and previewing the site to test it out locally.</p>
+							</div>
+						</div>
 					</div>
 				) : (
 					<div class="search-container">
@@ -98,14 +106,28 @@ import "@/styles/blocks/search.css";
 			if (import.meta.env.DEV) return;
 			const onIdle = window.requestIdleCallback || ((cb) => setTimeout(cb, 1));
 			onIdle(async () => {
-				const { PagefindUI } = await import("@pagefind/default-ui");
-				new PagefindUI({
-					baseUrl: import.meta.env.BASE_URL,
-					bundlePath: import.meta.env.BASE_URL.replace(/\/$/, "") + "/pagefind/",
-					element: "#cactus__search",
-					showImages: false,
-					showSubResults: true,
-				});
+				try {
+					console.log("Loading Pagefind UI...");
+					const { PagefindUI } = await import("@pagefind/default-ui");
+					console.log("Pagefind UI loaded successfully");
+					
+					const searchElement = document.getElementById("cactus__search");
+					if (!searchElement) {
+						console.error("Search element not found");
+						return;
+					}
+					
+					new PagefindUI({
+						baseUrl: import.meta.env.BASE_URL,
+						bundlePath: import.meta.env.BASE_URL.replace(/\/$/, "") + "/pagefind/",
+						element: "#cactus__search",
+						showImages: false,
+						showSubResults: true,
+					});
+					console.log("Pagefind UI initialized");
+				} catch (error) {
+					console.error("Failed to load Pagefind UI:", error);
+				}
 			});
 		}
 
@@ -125,7 +147,27 @@ import "@/styles/blocks/search.css";
 			}
 
 			this.#dialog.showModal();
-			this.querySelector("input")?.focus();
+			
+			// 개발 환경과 프로덕션 환경 모두에서 입력창에 포커스
+			// 프로덕션에서는 Pagefind UI가 로드되기를 기다림
+			const focusInput = (attempts = 0) => {
+				const input = this.querySelector("input") || 
+							 this.querySelector(".pagefind-ui__search-input") ||
+							 this.querySelector("[type='search']") ||
+							 this.querySelector("input[placeholder*='Search']");
+				
+				if (input) {
+					console.log("Found search input, focusing...");
+					input.focus();
+				} else if (attempts < 10) {
+					console.log(`Search input not found, attempt ${attempts + 1}/10`);
+					setTimeout(() => focusInput(attempts + 1), 200);
+				} else {
+					console.error("Could not find search input after 10 attempts");
+				}
+			};
+			
+			setTimeout(focusInput, 100);
 			event?.stopPropagation();
 			window.addEventListener("click", this.onWindowClick, { signal: this.#controller.signal });
 		};
