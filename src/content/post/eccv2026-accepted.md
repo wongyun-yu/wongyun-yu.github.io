@@ -1,5 +1,5 @@
 ---
-title: "A paper on full-body humanoid control is accepted to ECCV 2026"
+title: "WristMimic accepted to ECCV 2026"
 publishDate: "19 June 2026"
 description: "A paper on full-body humanoid control is accepted to ECCV 2026"
 tags: ["news", "publication", "ECCV"]
