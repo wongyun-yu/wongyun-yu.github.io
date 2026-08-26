@@ -45,8 +45,16 @@ export const menuLinks: { path: string; title: string }[] = [
 		title: "Education",
 	},
 	{
+		path: "/#experience",
+		title: "Experience",
+	},
+	{
 		path: "/#publications",
 		title: "Publications",
+	},
+	{
+		path: "/#talks",
+		title: "Talks",
 	},
 	{
 		path: "/#honors",
