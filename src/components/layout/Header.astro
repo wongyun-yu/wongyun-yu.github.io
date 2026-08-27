@@ -40,7 +40,7 @@ const socialLinks: {
 ];
 ---
 
-<header class="group sticky top-0 z-50 mb-10 flex flex-col sm:flex-row sm:items-center bg-global-bg/60 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 pt-5 sm:pt-16 pb-3 -mx-4 px-4 sm:mx-0 sm:px-0 sm:ps-18" id="main-header">
+<header class="group sticky top-0 z-50 mb-10 flex flex-col sm:flex-row sm:flex-wrap sm:items-center bg-global-bg/60 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 pt-5 sm:pt-16 pb-3 -mx-4 px-4 sm:mx-0 sm:px-0 sm:ps-18" id="main-header">
 	<!-- 프로필 및 이름 섹션 -->
 	<div class="flex sm:flex-col">
 		<div class="flex items-center justify-between w-full sm:justify-start">
@@ -100,14 +100,14 @@ const socialLinks: {
 
 		<nav
 			aria-label="Main menu"
-			class="bg-global-bg/95 text-accent sm:divide-accent fixed left-0 right-0 top-20 mx-0 hidden flex-col items-end gap-y-4 rounded-none py-4 px-4 shadow backdrop-blur-md group-[.menu-open]:z-50 group-[.menu-open]:flex sm:static sm:z-auto sm:ms-6 sm:mt-2.5 sm:transform sm:-translate-y-1 sm:flex sm:flex-row sm:items-center sm:divide-x sm:rounded-none sm:bg-transparent sm:py-0 sm:px-0 sm:shadow-none sm:backdrop-blur-none"
+			class="bg-global-bg/95 text-accent sm:divide-accent fixed left-0 right-0 top-20 mx-0 hidden flex-col items-end gap-y-4 rounded-none py-4 px-4 shadow backdrop-blur-md group-[.menu-open]:z-50 group-[.menu-open]:flex sm:static sm:z-auto sm:ms-6 sm:mt-2.5 sm:transform sm:-translate-y-1 sm:flex sm:flex-row sm:flex-wrap sm:items-center sm:divide-x sm:rounded-none sm:bg-transparent sm:py-0 sm:px-0 sm:shadow-none sm:backdrop-blur-none"
 			id="navigation-menu"
 		>
 			{
 				menuLinks.map((link) => (
 					<a
 						aria-current={Astro.url.pathname === link.path ? "page" : false}
-						class="px-4 py-4 underline-offset-2 hover:underline sm:py-0"
+						class="px-4 py-4 underline-offset-2 hover:underline sm:px-2.5 sm:py-0"
 						data-astro-prefetch
 						href={link.path}
 					>
