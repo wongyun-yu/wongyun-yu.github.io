@@ -116,55 +116,34 @@ const socialLinks: {
 				))
 			}
 		</nav>
-		<!-- Social Links below navigation -->
-		<div class="hidden sm:flex sm:justify-start sm:ml-9 sm:mt-2 sm:transform sm:translate-y-0.1">
-			<ul class="flex items-center gap-x-2">
-				{
-					socialLinks.map(({ friendlyName, isWebmention, link, name }) => (
-						<li class="flex">
-							<a
-								class="hover:text-link inline-block opacity-70 hover:opacity-100 transition-opacity"
-								href={link}
-								rel={`noreferrer ${isWebmention ? "me authn" : ""}`}
-								target="_blank"
-							>
-								<Icon aria-hidden="true" class="h-5 w-5 sm:h-6 sm:w-6" focusable="false" name={name} />
-								<span class="sr-only">{friendlyName}</span>
-							</a>
-						</li>
-					))
-				}
-			</ul>
-		</div>
 	</div>
-	<!-- 통합 검색 및 테마 토글 (반응형) -->
-	<div class="flex items-center justify-between w-full sm:justify-end sm:w-auto gap-x-3 mt-2 sm:mt-0 sm:ml-auto">
-		<!-- 모바일 전용 소셜 아이콘 (왼쪽) -->
-		<div class="flex sm:hidden items-center gap-x-2">
+
+	<!-- 소셜 + 이메일 + 검색 + 테마 (모바일: 프로필 아래 한 줄 / 데스크탑: nav 아래 전체 폭 한 줄) -->
+	<div class="flex items-center w-full sm:basis-full sm:ml-9 sm:mt-2 gap-x-3 mt-2 sm:mt-2">
+		<ul class="flex items-center gap-x-2">
 			{
 				socialLinks.map(({ friendlyName, isWebmention, link, name }) => (
-					<a
-						class="hover:text-link inline-block opacity-70 hover:opacity-100 transition-opacity"
-						href={link}
-						rel={`noreferrer ${isWebmention ? "me authn" : ""}`}
-						target="_blank"
-					>
-						<Icon aria-hidden="true" class="h-5 w-5" focusable="false" name={name} />
-						<span class="sr-only">{friendlyName}</span>
-					</a>
+					<li class="flex">
+						<a
+							class="hover:text-link inline-block opacity-70 hover:opacity-100 transition-opacity"
+							href={link}
+							rel={`noreferrer ${isWebmention ? "me authn" : ""}`}
+							target="_blank"
+						>
+							<Icon aria-hidden="true" class="h-5 w-5 sm:h-6 sm:w-6" focusable="false" name={name} />
+							<span class="sr-only">{friendlyName}</span>
+						</a>
+					</li>
 				))
 			}
-		</div>
-		<!-- 검색 및 테마 토글 (오른쪽) -->
-		<div class="flex items-center gap-x-3">
-			<a
-				aria-label="Email"
-				class="hover:text-link inline-block opacity-70 hover:opacity-100 transition-opacity"
-				href="mailto:yuwongyun@postech.ac.kr"
-			>
-				<Icon aria-hidden="true" class="h-5 w-5 sm:h-6 sm:w-6" focusable="false" name="mdi:email-outline" />
-				<span class="sr-only">Email</span>
-			</a>
+		</ul>
+		<a
+			class="hidden sm:inline-block text-sm opacity-70 hover:opacity-100 hover:underline transition-opacity"
+			href="mailto:yuwongyun@postech.ac.kr"
+		>
+			yuwongyun@postech.ac.kr
+		</a>
+		<div class="ml-auto flex items-center gap-x-3">
 			<Search />
 			<ThemeToggle />
 		</div>
@@ -186,11 +165,11 @@ const socialLinks: {
 		if (mobileButtonEl && headerEl && lineSvg && crossSvg) {
 			mobileButtonEl.addEventListener("click", () => {
 				console.log("Menu button clicked, current state:", menuOpen);
-				
+
 				toggleClass(headerEl, "menu-open");
 				menuOpen = !menuOpen;
 				mobileButtonEl.setAttribute("aria-expanded", menuOpen.toString());
-				
+
 				if (menuOpen) {
 					console.log("Showing X icon");
 					lineSvg.style.display = "none";
