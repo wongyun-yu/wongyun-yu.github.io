@@ -1,0 +1,119 @@
+<script>
+	// Private entry: tap the profile/name 5 times quickly, or type "hub" (outside text fields).
+	// The target address is stored only encrypted (public/k.json, AES-256-GCM, key = PBKDF2-SHA256 of the password).
+	// A wrong password just closes the box.
+	const SK = "rh-key";
+	const b64d = (s: string) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+	const b64e = (u: Uint8Array) => {
+		let s = "";
+		for (let i = 0; i < u.length; i += 32768) s += String.fromCharCode(...u.subarray(i, i + 32768));
+		return btoa(s);
+	};
+
+	async function tryOpen(pw: string): Promise<boolean> {
+		try {
+			const r = await fetch("/k.json", { cache: "no-cache" });
+			if (!r.ok) return false;
+			const k = await r.json();
+			const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveBits"]);
+			const raw = new Uint8Array(
+				await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt: b64d(k.s), iterations: k.i }, base, 256),
+			);
+			const key = await crypto.subtle.importKey("raw", raw, "AES-GCM", false, ["decrypt"]);
+			const buf = b64d(k.b);
+			const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: buf.subarray(0, 12) }, key, buf.subarray(12));
+			const url = JSON.parse(new TextDecoder().decode(pt)).u;
+			if (typeof url !== "string" || !url.startsWith("/")) return false;
+			try {
+				localStorage.setItem(SK, JSON.stringify({ salt: k.s, k: b64e(raw) }));
+			} catch {}
+			location.href = url;
+			return true;
+		} catch {
+			return false;
+		}
+	}
+
+	function openBox() {
+		if (document.getElementById("hx-box")) return;
+		const d = document.createElement("dialog");
+		d.id = "hx-box";
+		d.setAttribute("aria-label", "password");
+		d.style.cssText =
+			"padding:14px;border:1px solid currentColor;border-radius:8px;background:var(--color-global-bg,Canvas);color:inherit;font:inherit";
+		const f = document.createElement("form");
+		f.method = "dialog";
+		const i = document.createElement("input");
+		i.type = "password";
+		i.id = "hx-pw";
+		i.autocomplete = "current-password";
+		i.setAttribute("aria-label", "password");
+		i.style.cssText = "width:14rem;padding:6px 8px;border:1px solid currentColor;border-radius:6px;background:transparent;color:inherit;font:inherit";
+		f.append(i);
+		d.append(f);
+		document.body.append(d);
+		const close = () => {
+			d.close();
+			d.remove();
+		};
+		f.addEventListener("submit", async (e) => {
+			e.preventDefault();
+			const ok = await tryOpen(i.value);
+			if (!ok) close();
+		});
+		d.addEventListener("cancel", close);
+		d.addEventListener("click", (e) => {
+			if (e.target === d) close();
+		});
+		d.showModal();
+		i.focus();
+	}
+
+	// 5 quick taps on the header profile/name link (each within 600 ms). A single tap still navigates (after 450 ms).
+	function armTaps() {
+		const a = document.querySelector<HTMLAnchorElement>('#main-header a[href="/"]');
+		if (!a || a.dataset.hx) return;
+		a.dataset.hx = "1";
+		let n = 0;
+		let timer: ReturnType<typeof setTimeout> | undefined;
+		a.addEventListener("click", (e) => {
+			if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+			e.preventDefault();
+			n += 1;
+			clearTimeout(timer);
+			if (n >= 5) {
+				n = 0;
+				openBox();
+				return;
+			}
+			const href = a.href;
+			timer = setTimeout(() => {
+				const taps = n;
+				n = 0;
+				if (taps > 0) location.href = href;
+			}, n === 1 ? 450 : 600);
+		});
+	}
+
+	// Typing "hub" quickly anywhere outside a text field.
+	function armKeys() {
+		let seq = "";
+		let last = 0;
+		document.addEventListener("keydown", (e) => {
+			const t = e.target as HTMLElement | null;
+			if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+			if (e.metaKey || e.ctrlKey || e.altKey || e.key.length !== 1) return;
+			const now = Date.now();
+			seq = (now - last > 1200 ? "" : seq) + e.key.toLowerCase();
+			last = now;
+			if (seq.endsWith("hub")) {
+				seq = "";
+				openBox();
+			}
+		});
+	}
+
+	armTaps();
+	armKeys();
+	document.addEventListener("astro:page-load", armTaps);
+</script>
