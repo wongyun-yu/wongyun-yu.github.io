@@ -40,7 +40,7 @@
 		d.id = "hx-box";
 		d.setAttribute("aria-label", "password");
 		d.style.cssText =
-			"padding:14px;border:1px solid currentColor;border-radius:8px;background:var(--color-global-bg,Canvas);color:inherit;font:inherit";
+			"padding:20px;border:1px solid currentColor;border-radius:10px;background:var(--color-global-bg,Canvas);color:inherit;font:inherit;font-size:1.05rem";
 		const f = document.createElement("form");
 		f.method = "dialog";
 		const i = document.createElement("input");
@@ -48,7 +48,8 @@
 		i.id = "hx-pw";
 		i.autocomplete = "current-password";
 		i.setAttribute("aria-label", "password");
-		i.style.cssText = "width:14rem;padding:6px 8px;border:1px solid currentColor;border-radius:6px;background:transparent;color:inherit;font:inherit";
+		i.placeholder = "password";
+		i.style.cssText = "box-sizing:border-box;width:min(22rem,80vw);padding:10px 12px;border:1px solid currentColor;border-radius:8px;background:transparent;color:inherit;font:inherit";
 		f.append(i);
 		d.append(f);
 		document.body.append(d);
@@ -66,6 +67,7 @@
 			if (e.target === d) close();
 		});
 		d.showModal();
+		i.value = "";
 		i.focus();
 	}
 
@@ -107,6 +109,8 @@
 			seq = (now - last > 1200 ? "" : seq) + e.key.toLowerCase();
 			last = now;
 			if (seq.endsWith("hub")) {
+				// Swallow the final "b" so it does not land in the freshly focused input.
+				e.preventDefault();
 				seq = "";
 				openBox();
 			}
