@@ -1547,9 +1547,14 @@ function hasGL() {
 function markView(root, cls) {   // the view chip of the current camera is on; none after the reader drags the view
   $$('.ctrl .chip', root).forEach(b => { if (/\bv(front|ego|wide|close|exo|side)\b/.test(b.className)) b.classList.toggle('on', !!cls && b.classList.contains(cls)); });
 }
+// every 3D view; a texture that finishes loading marks them all dirty (texLoader uses the default loading manager)
+const VIEWS = new Set();
+THREE.DefaultLoadingManager.onProgress = () => VIEWS.forEach(v => { v.dirty = true; });
 class View3D {
   constructor(root, onFrame) {
     this.root = root; this.box = $('.stage3d', root); this.onFrame = onFrame; this.vis = false; this.started = false;
+    this.dirty = true; this.drawn = 0; this.hot = 0; VIEWS.add(this);
+    for (const ev of ['pointerdown', 'click', 'input', 'keydown', 'wheel']) root.addEventListener(ev, () => { this.hot = performance.now() + 700; }, {capture: true, passive: true});
     this.msg = document.createElement('div'); this.msg.className = 'msg'; this.msg.textContent = 'Loading 3D scene…'; this.box.appendChild(this.msg);
     const io = new IntersectionObserver(es => es.forEach(e => { this.vis = e.isIntersecting; if (this.vis) this.start(); }), {rootMargin: '150px'});
     io.observe(root);
@@ -1588,17 +1593,29 @@ class View3D {
       if (this.onStart) this.onStart();
     }
     if (!this.loop) {
+      // A frame is drawn only when the picture changes: the camera moved (drag, damping, auto-rotate, a tween — controls.update()
+      // says so), the viewer marked the scene dirty (a new data frame — every pose on the page is 30 fps data —, a pipeline
+      // transition, the split line), the reader is using the widget (hot), or 250 ms passed (a texture or room that arrived
+      // unmarked). The same frames as drawing on every display refresh, with a fraction of the GPU work.
       const tick = (now) => {
         if (!this.vis) { this.loop = null; return; }
         const dt = Math.min(0.1, (now - this.last) / 1000); this.last = now;
-        this.onFrame(dt); this.controls.update(); if (this.draw) this.draw(); else this.renderer.render(this.scene, this.camera);
+        this.onFrame(dt);
+        const moved = this.controls.update();
+        if (moved || this.dirty || now < this.hot || now - this.drawn >= 250) this.paint(now);
         this.loop = requestAnimationFrame(tick);
       };
-      this.last = performance.now(); this.loop = requestAnimationFrame(tick);
+      this.dirty = true; this.last = performance.now(); this.loop = requestAnimationFrame(tick);
     }
   }
-  resize() { const w = this.box.clientWidth, h = this.box.clientHeight; if (!w || !h) return; this.renderer.setSize(w, h, false); this.camera.aspect = this.aspect ? this.aspect(w, h) : w / h; this.camera.updateProjectionMatrix(); }
+  paint(now) { this.dirty = false; this.drawn = now || performance.now(); if (this.draw) this.draw(); else this.renderer.render(this.scene, this.camera); }
+  resize() {   // setSize clears the canvas: draw again at once, so the stage never shows an empty frame
+    const w = this.box.clientWidth, h = this.box.clientHeight; if (!w || !h) return;
+    this.renderer.setSize(w, h, false); this.camera.aspect = this.aspect ? this.aspect(w, h) : w / h; this.camera.updateProjectionMatrix();
+    if (this.loop) this.paint();
+  }
   look(c, instant) {
+    this.dirty = true;
     const e = new THREE.Vector3(...c.eye), t = new THREE.Vector3(...c.target);
     if (instant) { this.camera.position.copy(e); this.controls.target.copy(t); this.tween = null; return; }
     this.tween = {e0: this.camera.position.clone(), t0: this.controls.target.clone(), e1: e, t1: t, u: 0};
@@ -1757,6 +1774,7 @@ function wideOf(quad, back) {
     });
   }
   function render() {
+    view.dirty = true;
     if (!C || !H) return;
     const f = frame, m = S.mode;
     for (const s in mano) mano[s].m.visible = m === 'human';
@@ -2039,8 +2057,8 @@ function wideOf(quad, back) {
     const c = E.j.camClose, t = c.target, e = c.eye;
     return {close: c, mid: {target: t, eye: e.map((v, i) => t[i] + 2.2 * (v - t[i]))}, wide: wideOf(E.j.desk, 0.35)};
   }
-  function paint(g, m) { g.children.forEach(x => { if (!x.userData.base) x.userData.base = x.material; x.material = m || x.userData.base; }); }   // a link group red or back
-  function pose() { E.kt.apply(R.kin, frame); E.ot.apply(R.ours, frame); E.kot.apply(E.ok, frame); E.oot.apply(E.oo, frame); }
+  function paint(g, m) { view.dirty = true; g.children.forEach(x => { if (!x.userData.base) x.userData.base = x.material; x.material = m || x.userData.base; }); }   // a link group red or back
+  function pose() { view.dirty = true; E.kt.apply(R.kin, frame); E.ot.apply(R.ours, frame); E.kot.apply(E.ok, frame); E.oot.apply(E.oo, frame); }
   function onFrame(dt) {
     view.stepTween(dt);
     if (!E) return;
@@ -2137,7 +2155,7 @@ class EpView {
     this.scrub.max = n - 1; this.frame = Math.min(this.frame, n - 1); this.ft = this.frame;
     this.pose(); this.look('front', first);
   }
-  pose() { for (const e of this.shown) { const f = Math.min(this.frame, e.j.frames - 1); e.rt.apply(e.rn, f); e.ot.forEach((t, i) => t.apply([e.on[i]], f)); } }
+  pose() { this.view.dirty = true; for (const e of this.shown) { const f = Math.min(this.frame, e.j.frames - 1); e.rt.apply(e.rn, f); e.ot.forEach((t, i) => t.apply([e.on[i]], f)); } }
   cams() {
     const j = this.shown[0].j, f = j.focus, k = this.shown.length > 1 ? 1.35 : 1.0, t = [f[0], f[1], f[2] + 0.03];
     const quad = j.desk || [[f[0] - 0.4, f[1] - 0.6, f[2]], [f[0] + 0.4, f[1] - 0.6, f[2]], [f[0] + 0.4, f[1] + 0.6, f[2]], [f[0] - 0.4, f[1] + 0.6, f[2]]];
@@ -2197,6 +2215,7 @@ class EpView {
     } catch (err) { view.setMsg('3D scene failed to load (' + err.message + ')'); }
   };
   function pose() {
+    view.dirty = true;
     const hj = Hm.j, H = hj.human, f = Math.min(frame, hj.frames - 1), fr = Math.min(hj.f0 + f, E.j.frames - 1);
     E.rt.apply(E.rn, fr); E.ot.forEach((t, i) => t.apply([E.on[i]], fr));
     Hm.ot.apply(Hm.on, f);
@@ -2229,7 +2248,7 @@ class EpView {
   function onFrame(dt) {
     view.stepTween(dt);
     const w = view.tween, fv = w ? fovA + (fovB - fovA) * ease(w.u) : fovB;
-    if (Math.abs(view.camera.fov - fv) > 1e-3) { view.camera.fov = fv; view.camera.updateProjectionMatrix(); }
+    if (Math.abs(view.camera.fov - fv) > 1e-3) { view.camera.fov = fv; view.camera.updateProjectionMatrix(); view.dirty = true; }
     if (!Hm) return;
     const n = Hm.j.frames;
     if (playing && !dragging) { ft = (ft + dt * 30) % n; const nf = Math.floor(ft); if (nf !== frame) { frame = nf; pose(); } }
@@ -2249,7 +2268,7 @@ class EpView {
   }
   // the line: drag it (pointer) or move it with the arrow keys; a drag anywhere else on the stage still turns the camera
   function setS(v) {
-    s = Math.min(1, Math.max(0, v)); bar.style.setProperty('--s', (100 * s).toFixed(2) + '%');
+    s = Math.min(1, Math.max(0, v)); bar.style.setProperty('--s', (100 * s).toFixed(2) + '%'); view.dirty = true;
     const p = Math.round(100 * s);
     knob.setAttribute('aria-valuenow', p); knob.setAttribute('aria-valuetext', p + '% of the view shows the human demonstration');
     labL.classList.toggle('off', s < 0.3); labR.classList.toggle('off', s > 0.7);
@@ -2380,6 +2399,7 @@ class EpView {
   async function paint() {          // the current cell's appearance on this viewer's room, desk, panels and dome
     if (!LK) return;
     const R = await room(); if (!R) return;
+    V.view.dirty = true;
     const c = LK.cells[P][Ai], lk = LK.looks[c.look];
     R.children.forEach(m => {
       const kind = m.userData.rname;
