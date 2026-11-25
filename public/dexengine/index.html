@@ -348,7 +348,10 @@ figure { margin: 0; }
 
 #aug3d .row .chip { padding-inline: var(--space-xs); font-size: var(--text-sm); }
 #aug3d .row .sw { display: none; }
-@media (max-width: 75rem) { #aug3d .row .lab { flex-basis: 100%; } #aug3d .row .lw { display: none; } #aug3d .row .sw { display: inline; } }
+
+#aug3d[data-rows~="above"] .row .lab { flex-basis: 100%; }
+#aug3d[data-rows~="short"] .row .lw { display: none; } #aug3d[data-rows~="short"] .row .sw { display: inline; }
+@media (max-width: 75rem) { #aug3d:not([data-rows]) .row .lab { flex-basis: 100%; } #aug3d:not([data-rows]) .row .lw { display: none; } #aug3d:not([data-rows]) .row .sw { display: inline; } }
 @media (min-width: 64rem) { .aug-cols > .c-l6 { position: sticky; top: var(--space-2xl); align-self: start; } }
 .aug { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-xs) var(--space-sm); }
 .aug .ch .sw { display: none; }
@@ -2352,6 +2355,19 @@ class EpView {
 // Placement chips swap the episode (motion, objects, desk — the camera stays, so the shift shows); appearance chips repaint only
 // the desk top, floor, walls, ceiling panels, dome and tone-map saturation from assets/aug3d/looks.json (tools/looks.py: the
 // episode metas' look specs through the render's own tables). Distractors are not shown (their poses are not recorded).
+(function augRows() {   // the first layout in which every chip row fits on one line (see the #aug3d CSS)
+  const root = $('#aug3d'); if (!root) return;
+  const rows = $$('.row.pl, .row.ap', root);
+  const one = r => { const c = $$('.chip', r), l = $('.lab', r);
+    return c.every(x => x.offsetTop === c[0].offsetTop) && (root.dataset.rows !== 'beside' || c[0].offsetLeft > l.offsetLeft); };
+  let w = -1;
+  function fit(force) {
+    const nw = root.clientWidth; if (!force && nw === w) return; w = nw;
+    for (const m of ['beside', 'above', 'above short']) { root.dataset.rows = m; if (rows.every(one)) return; }
+  }
+  new ResizeObserver(() => fit(false)).observe(root);
+  if (document.fonts) document.fonts.ready.then(() => fit(true));
+})();
 (function aug3d() {
   const root = $('#aug3d'); if (!root) return;
   const A = D.aug3d, V = new EpView(root), cache = {};
