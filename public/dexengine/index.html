@@ -565,7 +565,7 @@ abbr { text-decoration: none; }
     <div class="widget v3d" id="split">
       <div class="stage3d" data-still-d="assets/3d/still_split_d.jpg" data-still-m="assets/3d/still_split_m.jpg"><span class="ovl slab sl">Human<span class="lw"> demonstration</span></span><span class="ovl r slab sr">Robot<span class="lw"> episode</span></span>
         <div class="split-bar" style="--s: 50%"><div class="split-knob" tabindex="0" role="slider" aria-label="Divider between the human demonstration and the robot episode" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-valuetext="Human on the left half, robot on the right half"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6"/></svg></div></div></div>
-      <div class="ctrl"><button class="pbtn" type="button">Pause</button><input type="range" min="0" max="255" value="0" aria-label="Frame"><button class="chip vfront" type="button">Front view</button><button class="chip vego" type="button">Ego view</button><button class="chip vexo" type="button">Exo view</button></div>
+      <div class="ctrl"><button class="pbtn" type="button">Pause</button><input type="range" min="0" max="255" value="0" aria-label="Frame"><button class="chip vside" type="button">Side view</button><button class="chip vego" type="button">Ego view</button><button class="chip vexo" type="button">Exo view</button></div>
       <p class="cap">A HOT3D demonstration and the robot episode generated from it with the SharpA hand, frame by frame.</p>
     </div>
     <dl class="figs">
@@ -1545,7 +1545,7 @@ function hasGL() {
 }
 // A lazily started three.js view: renders only while on screen.
 function markView(root, cls) {   // the view chip of the current camera is on; none after the reader drags the view
-  $$('.ctrl .chip', root).forEach(b => { if (/\bv(front|ego|wide|close|exo)\b/.test(b.className)) b.classList.toggle('on', !!cls && b.classList.contains(cls)); });
+  $$('.ctrl .chip', root).forEach(b => { if (/\bv(front|ego|wide|close|exo|side)\b/.test(b.className)) b.classList.toggle('on', !!cls && b.classList.contains(cls)); });
 }
 class View3D {
   constructor(root, onFrame) {
@@ -2165,7 +2165,8 @@ class EpView {
 // ---------- overview: one recorded episode and its human demonstration in one camera, split by a line the reader drags ----------
 // Left of the line: the human demonstration (MANO hands, objects at their human poses — tools/export_split.py, the data's own
 // chain, frame for frame with the episode). Right of it: the robot episode (tools/export_ep.py). Room, desk and the static extra
-// object are drawn on both sides. Cameras: a front view, the recorded head camera (ego) and the recorded exocentric camera.
+// object are drawn on both sides. Cameras: a side view, the recorded head camera (ego) and the recorded exocentric camera (exo, in
+// front of the robot and above it).
 (function split3d() {
   const root = $('#split'); if (!root) return;
   const S = D.split, box = $('.stage3d', root), bar = $('.split-bar', root), knob = $('.split-knob', root);
@@ -2191,7 +2192,7 @@ class EpView {
       on.forEach(m => hg.add(m));
       E = e; Hm = {j: hj, g: hg, hands, on, ot: new Track(hb, hj.human.obj, hj.frames, on.length)};
       scrub.max = hj.frames - 1;
-      pose(); look('front', true); view.setMsg('');
+      pose(); look('side', true); view.setMsg('');
     } catch (err) { view.setMsg('3D scene failed to load (' + err.message + ')'); }
   };
   function pose() {
@@ -2208,10 +2209,10 @@ class EpView {
   // the one that keeps the recorded horizontal fov (ego: ZED Mini HD720, fy 732 -> 52.4° x 82.3°; exo: square, from the episode)
   function fit(vf, hf) { const a = view.camera.aspect || 1; return Math.max(vf, 2 * Math.atan(Math.tan(hf * Math.PI / 360) / a) * 180 / Math.PI); }
   function cams() {
-    const j = E.j, f = j.focus, t = [f[0] - 0.15, f[1], f[2] + 0.22];      // front view: from the robot's front left, the bowl at the line
+    const j = E.j, f = j.focus, t = [f[0] - 0.15, f[1], f[2] + 0.22];      // side view: from the robot's left, about 40° off its front, the bowl at the line
     const Hc = j.camH, M = Hc.M[Math.min(Hc.M.length - 1, Math.floor((Hm.j.f0 + frame) / Hc.every))];
     const x = Hm.j.exo;
-    return {front: {eye: [t[0] + 1.25, t[1] + 0.72, t[2] + 0.58], target: t, fov: 47},
+    return {side: {eye: [t[0] + 1.15, t[1] + 0.95, t[2] + 0.81], target: t, fov: 47},
             ego: {eye: [M[0][3], M[1][3], M[2][3]], target: [M[0][3] + M[0][2], M[1][3] + M[1][2], M[2][3] + M[2][2]], fov: fit(52.4, 82.3)},
             exo: {eye: x.eye, target: x.target, fov: fit(x.fov, x.fov)}};
   }
@@ -2262,7 +2263,7 @@ class EpView {
   btn.addEventListener('click', () => { playing = !playing; btn.textContent = playing ? 'Pause' : 'Play'; });
   scrub.addEventListener('input', () => { if (!Hm) return; dragging = true; frame = +scrub.value; ft = frame; pose(); });
   scrub.addEventListener('change', () => { dragging = false; });
-  for (const k of ['front', 'ego', 'exo']) $('.v' + k, root).addEventListener('click', () => look(k));
+  for (const k of ['side', 'ego', 'exo']) $('.v' + k, root).addEventListener('click', () => look(k));
   root.__ep = () => ({shown: E && Hm ? 1 : 0, frame, n: Hm ? Hm.j.frames : 0, s});
   root.__split = {set: setS, look: k => look(k, true), frame: f => { frame = f; ft = f; playing = false; pose(); },
                   cam: c => { view.look(c, true); view.camera.fov = c.fov; view.camera.updateProjectionMatrix(); fovB = c.fov; }, info: () => ({focus: E.j.focus, base: E.j.base})};
