@@ -142,6 +142,23 @@ input[type=range]:disabled { cursor: not-allowed; accent-color: var(--color-rule
    border-top: var(--rule-hair) solid var(--color-rule); padding-top: var(--space-md); min-width: 0; }
 .figs dd { margin: 0; font-weight: var(--display-weight); font-stretch: var(--display-stretch); font-size: var(--text-display-s); letter-spacing: -0.03em; line-height: 0.95; }
 .figs dt { color: var(--color-muted); font-size: var(--text-sm); font-weight: 500; }
+
+.tldr-side { grid-column: 8 / span 5; align-self: stretch; display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-2xl); min-width: 0; }
+#split .stage3d { aspect-ratio: 1 / 1; }
+#split .ctrl { flex-wrap: wrap; }
+#split .ctrl input[type=range] { flex: 1 1 100%; order: -1; }
+#split .cap { margin-top: var(--space-sm); }
+@media (max-width: 40rem) { #split .slab .lw { display: none; } }
+.split-bar { position: absolute; top: 0; bottom: 0; left: var(--s, 50%); width: 44px; transform: translateX(-50%); z-index: 2; cursor: ew-resize; touch-action: none; }
+.split-bar::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; margin-left: -1px; background: var(--color-ink); }
+.split-knob { position: absolute; left: 50%; top: 50%; width: 40px; height: 40px; margin: -20px 0 0 -20px; display: grid; place-items: center; background: var(--color-ink); color: var(--color-paper); border-radius: var(--radius-pill); }
+.split-knob svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: square; }
+.split-knob:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.split-bar:hover .split-knob, .split-bar.drag .split-knob { background: var(--color-accent); color: var(--color-accent-ink); }
+.stage3d .slab { transition: opacity var(--dur-short) var(--ease-out); }
+.stage3d .slab.off { opacity: 0; }
+.stage3d.nogl .split-bar { display: none; }
+#split .stage3d.nogl::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--color-ink); }
 .mdefs { display: grid; gap: var(--space-2xs); margin: var(--space-md) 0 0; font-size: var(--text-sm); line-height: 1.45; }
 .mdefs > div { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: var(--space-sm); }
 .mdefs dt { color: var(--color-ink); font-weight: 500; }
@@ -503,7 +520,7 @@ abbr { text-decoration: none; }
 
 @media (max-width: 60rem) {
   :root { --gutter: 24px; --section-gap-s: 80px; --section-gap: 96px; --section-gap-l: 120px; }
-  .tldr-head, .figs, .faults, .bib, .bib-act { grid-column: 1 / -1; }
+  .tldr-head, .tldr-side, .figs, .faults, .bib, .bib-act { grid-column: 1 / -1; }
   .faults { grid-template-columns: minmax(0, 1fr); }
   .head h2, .head .h2like, .head .lead { grid-column: 1 / -1; }
   .head .lead { margin-top: var(--space-md); }
@@ -544,12 +561,20 @@ abbr { text-decoration: none; }
       <p>From nine human hand-object datasets, we generate about 5,200 clips for each of four dexterous hands, augmented into 65,000 trajectories (116 h) and 325,000 episodes (578 h) in total. Even with arms attached, DexEngine tracks objects more accurately than prior floating-hand methods and runs over 10× faster than RL-based ones. Policies trained on our data far outperform those trained on the same clips without physics correction or with the arms attached after a floating-hand correction, showing that fine-tuning data need physics correction. Mid-training on our data further improves them at equal fine-tuning budget, in simulation and on a real robot.</p>
     </div></div>
     </div>
+    <div class="tldr-side">
+    <div class="widget v3d" id="split">
+      <div class="stage3d" data-still-d="assets/3d/still_split_d.jpg" data-still-m="assets/3d/still_split_m.jpg"><span class="ovl slab sl">Human<span class="lw"> demonstration</span></span><span class="ovl r slab sr">Robot<span class="lw"> episode</span></span>
+        <div class="split-bar" style="--s: 50%"><div class="split-knob" tabindex="0" role="slider" aria-label="Divider between the human demonstration and the robot episode" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-valuetext="Human on the left half, robot on the right half"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 6l-6 6 6 6M15 6l6 6-6 6"/></svg></div></div></div>
+      <div class="ctrl"><button class="pbtn" type="button">Pause</button><input type="range" min="0" max="255" value="0" aria-label="Frame"><button class="chip vfront" type="button">Front view</button><button class="chip vego" type="button">Ego view</button><button class="chip vexo" type="button">Exo view</button></div>
+      <p class="cap">A HOT3D demonstration and the robot episode generated from it with the SharpA hand, frame by frame.</p>
+    </div>
     <dl class="figs">
       <div><dt>robot hands that share the same source clips</dt><dd>4</dd></div>
       <div><dt>human hand-object datasets</dt><dd>9</dd></div>
       <div><dt>episodes (578 h) from 65K trajectories</dt><dd>325K</dd></div>
       <div><dt>GPU-minutes per clip</dt><dd>&lt; 5</dd></div>
     </dl>
+    </div>
   </div>
 </section>
 
@@ -893,7 +918,8 @@ abbr { text-decoration: none; }
   "xhand":   {"json": "assets/3d/vis_xhand.json", "bin": "assets/3d/vis_xhand.bin"},
   "tesollo": {"json": "assets/3d/vis_tesollo.json", "bin": "assets/3d/vis_tesollo.bin"}
  },
- "pipe3d": {
+ "split": {"robot": {"json": "assets/3d/ep_split_sharpa.json", "bin": "assets/3d/ep_split_sharpa.bin"}, "human": {"json": "assets/3d/human_split_sharpa.json", "bin": "assets/3d/human_split_sharpa.bin"}},
+"pipe3d": {
   "steps": [
    "The input is a human hand–object demonstration: the wrist pose and finger articulation of each human hand and the pose of each object, at every frame. It is the same for all four hands.",
    "We retarget the human hand pose at every frame to a floating robot hand. The smallest first-frame change removes any initial penetration, and a short lead-in blends it into the motion.",
@@ -1519,7 +1545,7 @@ function hasGL() {
 }
 // A lazily started three.js view: renders only while on screen.
 function markView(root, cls) {   // the view chip of the current camera is on; none after the reader drags the view
-  $$('.ctrl .chip', root).forEach(b => { if (/\bv(front|ego|wide|close)\b/.test(b.className)) b.classList.toggle('on', !!cls && b.classList.contains(cls)); });
+  $$('.ctrl .chip', root).forEach(b => { if (/\bv(front|ego|wide|close|exo)\b/.test(b.className)) b.classList.toggle('on', !!cls && b.classList.contains(cls)); });
 }
 class View3D {
   constructor(root, onFrame) {
@@ -2136,6 +2162,112 @@ class EpView {
     r.setScissorTest(false);
   }
 }
+// ---------- overview: one recorded episode and its human demonstration in one camera, split by a line the reader drags ----------
+// Left of the line: the human demonstration (MANO hands, objects at their human poses — tools/export_split.py, the data's own
+// chain, frame for frame with the episode). Right of it: the robot episode (tools/export_ep.py). Room, desk and the static extra
+// object are drawn on both sides. Cameras: a front view, the recorded head camera (ego) and the recorded exocentric camera.
+(function split3d() {
+  const root = $('#split'); if (!root) return;
+  const S = D.split, box = $('.stage3d', root), bar = $('.split-bar', root), knob = $('.split-knob', root);
+  const scrub = $('.ctrl input[type=range]', root), btn = $('.pbtn', root), labL = $('.slab.sl', root), labR = $('.slab.sr', root);
+  const view = new View3D(root, onFrame), ctx = {view, room: null};
+  let E = null, Hm = null, frame = 0, ft = 0, playing = true, dragging = false, s = 0.5, fovA = 45, fovB = 45;
+  const ease = x => x * x * (3 - 2 * x);
+  view.draw = draw;
+  view.onStart = async () => {
+    try {
+      const [e, hj, hb] = await Promise.all([EpView.prototype.episode.call(ctx, S.robot), load(S.human.json), load(S.human.bin, 'bin')]);
+      e.g.visible = true;
+      const hg = new THREE.Group(), hands = [];
+      view.scene.add(hg);
+      for (const k in hj.human.hands) {
+        const h = hj.human.hands[k], g = new THREE.BufferGeometry();
+        g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(h.nv * 3), 3));
+        g.setIndex(new THREE.BufferAttribute(new Uint16Array(hb, h.idx, h.ni), 1));
+        const m = new THREE.Mesh(g, mat(hj.human.col, 'skin')); hg.add(m);
+        hands.push({m, q: new Int16Array(hb, h.verts, hj.frames * h.nv * 3), nv: h.nv});
+      }
+      const on = await Promise.all(hj.objects.map(o => objNode(o)));
+      on.forEach(m => hg.add(m));
+      E = e; Hm = {j: hj, g: hg, hands, on, ot: new Track(hb, hj.human.obj, hj.frames, on.length)};
+      scrub.max = hj.frames - 1;
+      pose(); look('front', true); view.setMsg('');
+    } catch (err) { view.setMsg('3D scene failed to load (' + err.message + ')'); }
+  };
+  function pose() {
+    const hj = Hm.j, H = hj.human, f = Math.min(frame, hj.frames - 1), fr = Math.min(hj.f0 + f, E.j.frames - 1);
+    E.rt.apply(E.rn, fr); E.ot.forEach((t, i) => t.apply([E.on[i]], fr));
+    Hm.ot.apply(Hm.on, f);
+    for (const o of Hm.hands) {
+      const a = o.m.geometry.attributes.position, b = f * o.nv * 3;
+      for (let i = 0; i < o.nv * 3; i += 3) { a.array[i] = H.c[0] + o.q[b + i] * H.s; a.array[i + 1] = H.c[1] + o.q[b + i + 1] * H.s; a.array[i + 2] = H.c[2] + o.q[b + i + 2] * H.s; }
+      a.needsUpdate = true; o.m.geometry.computeVertexNormals(); o.m.geometry.computeBoundingSphere();
+    }
+  }
+  // the recorded cameras keep their field of view in the square stage: vertical fov = the larger of the recorded vertical fov and
+  // the one that keeps the recorded horizontal fov (ego: ZED Mini HD720, fy 732 -> 52.4° x 82.3°; exo: square, from the episode)
+  function fit(vf, hf) { const a = view.camera.aspect || 1; return Math.max(vf, 2 * Math.atan(Math.tan(hf * Math.PI / 360) / a) * 180 / Math.PI); }
+  function cams() {
+    const j = E.j, f = j.focus, t = [f[0] - 0.15, f[1], f[2] + 0.22];      // front view: from the robot's front left, the bowl at the line
+    const Hc = j.camH, M = Hc.M[Math.min(Hc.M.length - 1, Math.floor((Hm.j.f0 + frame) / Hc.every))];
+    const x = Hm.j.exo;
+    return {front: {eye: [t[0] + 1.25, t[1] + 0.72, t[2] + 0.58], target: t, fov: 47},
+            ego: {eye: [M[0][3], M[1][3], M[2][3]], target: [M[0][3] + M[0][2], M[1][3] + M[1][2], M[2][3] + M[2][2]], fov: fit(52.4, 82.3)},
+            exo: {eye: x.eye, target: x.target, fov: fit(x.fov, x.fov)}};
+  }
+  function look(k, instant) {
+    if (!E) return;
+    const c = cams()[k];
+    fovA = view.camera.fov; fovB = c.fov;
+    view.look(c, instant);
+    if (instant) { view.camera.fov = fovB; view.camera.updateProjectionMatrix(); }
+    markView(root, 'v' + k);
+  }
+  function onFrame(dt) {
+    view.stepTween(dt);
+    const w = view.tween, fv = w ? fovA + (fovB - fovA) * ease(w.u) : fovB;
+    if (Math.abs(view.camera.fov - fv) > 1e-3) { view.camera.fov = fv; view.camera.updateProjectionMatrix(); }
+    if (!Hm) return;
+    const n = Hm.j.frames;
+    if (playing && !dragging) { ft = (ft + dt * 30) % n; const nf = Math.floor(ft); if (nf !== frame) { frame = nf; pose(); } }
+    if (!dragging) scrub.value = frame;
+  }
+  function side(human) { Hm.g.visible = human; E.rn.forEach(g => { g.visible = !human; }); E.on.forEach(o => { o.visible = !human; }); }
+  function draw() {
+    const r = view.renderer, w = box.clientWidth, h = box.clientHeight;
+    if (!E || !Hm) { r.render(view.scene, view.camera); return; }
+    const x = Math.round(w * s);
+    r.setScissorTest(true); r.setViewport(0, 0, w, h);
+    if (x > 0) { side(true); r.setScissor(0, 0, x, h); r.render(view.scene, view.camera); }
+    if (x < w) { side(false); r.setScissor(x, 0, w - x, h); r.render(view.scene, view.camera); }
+    r.setScissorTest(false);
+  }
+  // the line: drag it (pointer) or move it with the arrow keys; a drag anywhere else on the stage still turns the camera
+  function setS(v) {
+    s = Math.min(1, Math.max(0, v)); bar.style.setProperty('--s', (100 * s).toFixed(2) + '%');
+    const p = Math.round(100 * s);
+    knob.setAttribute('aria-valuenow', p); knob.setAttribute('aria-valuetext', p + '% of the view shows the human demonstration');
+    labL.classList.toggle('off', s < 0.3); labR.classList.toggle('off', s > 0.7);
+  }
+  const at = e => { const b = box.getBoundingClientRect(); setS((e.clientX - b.left) / b.width); };
+  bar.addEventListener('pointerdown', e => { e.preventDefault(); bar.setPointerCapture(e.pointerId); bar.classList.add('drag'); box.classList.add('touched'); at(e); });
+  bar.addEventListener('pointermove', e => { if (bar.hasPointerCapture(e.pointerId)) at(e); });
+  const up = e => { if (bar.hasPointerCapture(e.pointerId)) bar.releasePointerCapture(e.pointerId); bar.classList.remove('drag'); };
+  bar.addEventListener('pointerup', up); bar.addEventListener('pointercancel', up);
+  knob.addEventListener('keydown', e => {
+    const d = {ArrowLeft: -0.05, ArrowDown: -0.05, ArrowRight: 0.05, ArrowUp: 0.05, PageDown: -0.25, PageUp: 0.25}[e.key];
+    if (d !== undefined) setS(s + d); else if (e.key === 'Home') setS(0); else if (e.key === 'End') setS(1); else return;
+    e.preventDefault();
+  });
+  btn.addEventListener('click', () => { playing = !playing; btn.textContent = playing ? 'Pause' : 'Play'; });
+  scrub.addEventListener('input', () => { if (!Hm) return; dragging = true; frame = +scrub.value; ft = frame; pose(); });
+  scrub.addEventListener('change', () => { dragging = false; });
+  for (const k of ['front', 'ego', 'exo']) $('.v' + k, root).addEventListener('click', () => look(k));
+  root.__ep = () => ({shown: E && Hm ? 1 : 0, frame, n: Hm ? Hm.j.frames : 0, s});
+  root.__split = {set: setS, look: k => look(k, true), frame: f => { frame = f; ft = f; playing = false; pose(); },
+                  cam: c => { view.look(c, true); view.camera.fov = c.fov; view.camera.updateProjectionMatrix(); fovB = c.fov; }, info: () => ({focus: E.j.focus, base: E.j.base})};
+  root.__epTick = n => { for (let i = 0; i < n; i++) { onFrame(0.1); view.controls.update(); } draw(); };
+})();
 (function hands3d() {
   const root = $('#hands'); if (!root) return;
   const chips = $$('.row .chip', root), box = $('.stage3d', root), labs = $$('.qlab', root), order = ['wuji2', 'sharpa', 'xhand', 'tesollo'];
