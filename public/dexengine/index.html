@@ -2172,9 +2172,10 @@ class EpView {
   const S = D.split, box = $('.stage3d', root), bar = $('.split-bar', root), knob = $('.split-knob', root);
   const scrub = $('.ctrl input[type=range]', root), btn = $('.pbtn', root), labL = $('.slab.sl', root), labR = $('.slab.sr', root);
   const view = new View3D(root, onFrame), ctx = {view, room: null};
-  let E = null, Hm = null, frame = 0, ft = 0, playing = true, dragging = false, s = 0.5, fovA = 45, fovB = 45;
+  let E = null, Hm = null, frame = 0, ft = 0, playing = true, dragging = false, s = 0.5, fovA = 45, fovB = 45, band = false;
   const ease = x => x * x * (3 - 2 * x);
   view.draw = draw;
+  view.aspect = (w, h) => band ? 16 / 9 : w / h;   // ego: the recorded 16:9 frame, drawn as a band across the square stage
   view.onStart = async () => {
     try {
       const [e, hj, hb] = await Promise.all([EpView.prototype.episode.call(ctx, S.robot), load(S.human.json), load(S.human.bin, 'bin')]);
@@ -2205,19 +2206,20 @@ class EpView {
       a.needsUpdate = true; o.m.geometry.computeVertexNormals(); o.m.geometry.computeBoundingSphere();
     }
   }
-  // the recorded cameras keep their field of view in the square stage: vertical fov = the larger of the recorded vertical fov and
-  // the one that keeps the recorded horizontal fov (ego: ZED Mini HD720, fy 732 -> 52.4° x 82.3°; exo: square, from the episode)
-  function fit(vf, hf) { const a = view.camera.aspect || 1; return Math.max(vf, 2 * Math.atan(Math.tan(hf * Math.PI / 360) / a) * 180 / Math.PI); }
+  // the recorded cameras show exactly their recorded frame: exo is square (its vertical fov, from the episode); ego is the
+  // 16:9 head camera (ZED Mini HD720, fy 732 -> 52.4° vertical), drawn in a band across the stage with the stage colour above and
+  // below. The band follows the field of view: it stays until another view is chosen, a drag only turns the camera.
   function cams() {
     const j = E.j, f = j.focus, t = [f[0] - 0.15, f[1], f[2] + 0.22];      // side view: from the robot's left, about 40° off its front, the bowl at the line
     const Hc = j.camH, M = Hc.M[Math.min(Hc.M.length - 1, Math.floor((Hm.j.f0 + frame) / Hc.every))];
     const x = Hm.j.exo;
     return {side: {eye: [t[0] + 1.15, t[1] + 0.95, t[2] + 0.81], target: t, fov: 47},
-            ego: {eye: [M[0][3], M[1][3], M[2][3]], target: [M[0][3] + M[0][2], M[1][3] + M[1][2], M[2][3] + M[2][2]], fov: fit(52.4, 82.3)},
-            exo: {eye: x.eye, target: x.target, fov: fit(x.fov, x.fov)}};
+            ego: {eye: [M[0][3], M[1][3], M[2][3]], target: [M[0][3] + M[0][2], M[1][3] + M[1][2], M[2][3] + M[2][2]], fov: 52.4},
+            exo: {eye: x.eye, target: x.target, fov: x.fov}};
   }
   function look(k, instant) {
     if (!E) return;
+    if (band !== (k === 'ego')) { band = k === 'ego'; view.resize(); }
     const c = cams()[k];
     fovA = view.camera.fov; fovB = c.fov;
     view.look(c, instant);
@@ -2237,10 +2239,12 @@ class EpView {
   function draw() {
     const r = view.renderer, w = box.clientWidth, h = box.clientHeight;
     if (!E || !Hm) { r.render(view.scene, view.camera); return; }
-    const x = Math.round(w * s);
-    r.setScissorTest(true); r.setViewport(0, 0, w, h);
-    if (x > 0) { side(true); r.setScissor(0, 0, x, h); r.render(view.scene, view.camera); }
-    if (x < w) { side(false); r.setScissor(x, 0, w - x, h); r.render(view.scene, view.camera); }
+    const x = Math.round(w * s), bw = band ? Math.min(w, h * 16 / 9) : w, bh = band ? bw * 9 / 16 : h, x0 = (w - bw) / 2, y0 = (h - bh) / 2;
+    r.setScissorTest(true);
+    if (band) { r.setScissor(0, 0, w, h); r.clear(); }   // transparent: the stage colour shows above and below the band
+    r.setViewport(x0, y0, bw, bh);
+    if (x > 0) { side(true); r.setScissor(0, y0, x, bh); r.render(view.scene, view.camera); }
+    if (x < w) { side(false); r.setScissor(x, y0, w - x, bh); r.render(view.scene, view.camera); }
     r.setScissorTest(false);
   }
   // the line: drag it (pointer) or move it with the arrow keys; a drag anywhere else on the stage still turns the camera
